@@ -4,38 +4,56 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Topbar } from '@/components/layout/topbar';
-import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+
+const loginSchema = z.object({
+  email: z.string().email('올바른 이메일 형식이 아닙니다.'),
+  password: z.string().min(1, '비밀번호를 입력해주세요.'),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
-    setErrorMessage('');
 
     try {
       const result = await signIn('credentials', {
-        email,
-        password,
+        email: data.email,
+        password: data.password,
         redirect: false,
       });
 
       if (result?.error) {
-        setErrorMessage(result.error);
-        
         // 구체적인 에러 메시지에 따라 다른 토스트 메시지 표시
         if (result.error.includes('등록되지 않은 이메일')) {
           toast({
@@ -65,7 +83,6 @@ export default function LoginPage() {
         router.refresh();
       } else {
         const errorMsg = '로그인 중 오류가 발생했습니다. 다시 시도해주세요.';
-        setErrorMessage(errorMsg);
         toast({
           title: '로그인 실패',
           description: errorMsg,
@@ -74,7 +91,6 @@ export default function LoginPage() {
       }
     } catch (error) {
       const errorMsg = '로그인 중 오류가 발생했습니다. 다시 시도해주세요.';
-      setErrorMessage(errorMsg);
       toast({
         title: '오류 발생',
         description: errorMsg,
@@ -103,71 +119,77 @@ export default function LoginPage() {
               </CardHeader>
               
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">이메일</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="이메일을 입력하세요"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10"
-                        required
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="password">비밀번호</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                      <Input
-                        id="password"
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder="비밀번호를 입력하세요"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="pl-10 pr-10"
-                        required
-                        disabled={isLoading}
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
-                        disabled={isLoading}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4 text-gray-400" />
-                        ) : (
-                          <Eye className="h-4 w-4 text-gray-400" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>이메일</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 z-10" />
+                              <Input
+                                {...field}
+                                type="email"
+                                placeholder="이메일을 입력하세요"
+                                className="pl-10"
+                                disabled={isLoading}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  {/* 에러 메시지 표시 */}
-                  {errorMessage && (
-                    <div className="flex items-center space-x-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-                      <p className="text-sm text-red-700">{errorMessage}</p>
-                    </div>
-                  )}
-                  
-                  <Button
-                    type="submit"
-                    className="w-full bg-brand-red hover:bg-brand-red/90"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? '로그인 중...' : '로그인'}
-                  </Button>
-                </form>
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>비밀번호</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 z-10" />
+                              <Input
+                                {...field}
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="비밀번호를 입력하세요"
+                                className="pl-10 pr-10"
+                                disabled={isLoading}
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                onClick={() => setShowPassword(!showPassword)}
+                                disabled={isLoading}
+                              >
+                                {showPassword ? (
+                                  <EyeOff className="h-4 w-4 text-gray-400" />
+                                ) : (
+                                  <Eye className="h-4 w-4 text-gray-400" />
+                                )}
+                              </Button>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button
+                      type="submit"
+                      className="w-full bg-brand-red hover:bg-brand-red/90"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? '로그인 중...' : '로그인'}
+                    </Button>
+                  </form>
+                </Form>
                 
                 <div className="mt-6 text-center space-y-4">
                   {/* 회원가입 링크를 더 눈에 띄게 */}
