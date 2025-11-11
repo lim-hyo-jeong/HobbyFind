@@ -53,7 +53,6 @@ export default function CategoryPage() {
 
   const handleBookmarkToggle = (id: string, isBookmarked: boolean) => {
     // 북마크 상태 변경 처리 (이미 HobbyCard에서 처리됨)
-    console.log(`Bookmark ${id}: ${isBookmarked}`);
   };
 
   const handleCategoryChange = (newCategory: string | null) => {

@@ -45,7 +45,6 @@ export default function MyPage() {
         setTotalCount(statsData.data.totalCount);
       }
     } catch (error) {
-      console.error('Error loading bookmark data:', error);
       toast({
         title: '데이터 로드 실패',
         description: '북마크 데이터를 불러올 수 없습니다.',

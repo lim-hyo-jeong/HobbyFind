@@ -9,11 +9,6 @@ export async function createClient() {
     
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    
-    console.log('Creating Supabase client with:', {
-      url: supabaseUrl || 'URL missing',
-      key: serviceRoleKey ? `${serviceRoleKey.substring(0, 20)}...` : 'Key missing'
-    });
 
     if (!supabaseUrl) {
       throw new Error('NEXT_PUBLIC_SUPABASE_URL environment variable is not set');
@@ -27,8 +22,6 @@ export async function createClient() {
     if (!supabaseUrl.startsWith('https://')) {
       throw new Error('Invalid Supabase URL format. URL must start with https://');
     }
-
-    console.log('Creating server client with URL:', supabaseUrl);
     
     const client = createServerClient(
       supabaseUrl,
@@ -53,10 +46,11 @@ export async function createClient() {
       }
     );
     
-    console.log('Supabase client created successfully');
     return client;
   } catch (error) {
-    console.error('Error creating Supabase client:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error creating Supabase client:', error);
+    }
     throw error;
   }
 }

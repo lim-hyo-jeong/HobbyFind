@@ -43,7 +43,7 @@ export function HobbyCard({
           setBookmarked(data.isBookmarked);
         }
       } catch (error) {
-        console.error('Error checking bookmark status:', error);
+        // 에러는 조용히 처리 (사용자에게는 표시하지 않음)
       }
     };
 

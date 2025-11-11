@@ -30,7 +30,9 @@ export async function POST(request: NextRequest) {
       message: isBookmarked ? '북마크에 추가되었습니다.' : '북마크에서 제거되었습니다.',
     });
   } catch (error) {
-    console.error('Error toggling bookmark:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error toggling bookmark:', error);
+    }
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

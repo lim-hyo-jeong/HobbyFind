@@ -12,25 +12,24 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          console.log("Missing credentials");
           throw new Error("이메일과 비밀번호를 모두 입력해주세요.");
         }
 
         try {
-          console.log("Attempting to authenticate user:", credentials.email);
           const user = await authenticateUser({
             email: credentials.email,
             password: credentials.password,
           });
 
-          console.log("Authentication successful for user:", user.email);
           return {
             id: user.id,
             email: user.email,
             name: user.username,
           };
         } catch (error) {
-          console.error("Authentication error:", error);
+          if (process.env.NODE_ENV === 'development') {
+            console.error("Authentication error:", error);
+          }
           // 에러 메시지를 그대로 전달
           throw new Error(error instanceof Error ? error.message : "로그인 중 오류가 발생했습니다.");
         }
@@ -43,7 +42,6 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        console.log("JWT callback - user found:", user.email);
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
@@ -52,7 +50,6 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token) {
-        console.log("Session callback - token found:", token.email);
         session.user.id = token.id as string;
         session.user.email = token.email as string;
         session.user.name = token.name as string;

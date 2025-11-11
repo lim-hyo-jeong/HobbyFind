@@ -31,7 +31,9 @@ export async function GET(request: NextRequest) {
       isBookmarked: bookmarked,
     });
   } catch (error) {
-    console.error('Error checking bookmark status:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error checking bookmark status:', error);
+    }
     return NextResponse.json(
       { 
         success: false,

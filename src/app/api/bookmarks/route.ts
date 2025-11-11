@@ -21,7 +21,9 @@ export async function GET(request: NextRequest) {
       data: bookmarkedHobbies,
     });
   } catch (error) {
-    console.error('Error fetching bookmarks:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching bookmarks:', error);
+    }
     return NextResponse.json(
       { 
         success: false,

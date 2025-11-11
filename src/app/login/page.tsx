@@ -26,8 +26,6 @@ export default function LoginPage() {
     setIsLoading(true);
     setErrorMessage('');
 
-    console.log('Login attempt for email:', email);
-
     try {
       const result = await signIn('credentials', {
         email,
@@ -35,10 +33,7 @@ export default function LoginPage() {
         redirect: false,
       });
 
-      console.log('SignIn result:', result);
-
       if (result?.error) {
-        console.error('Login error:', result.error);
         setErrorMessage(result.error);
         
         // 구체적인 에러 메시지에 따라 다른 토스트 메시지 표시
@@ -62,7 +57,6 @@ export default function LoginPage() {
           });
         }
       } else if (result?.ok) {
-        console.log('Login successful');
         toast({
           title: '로그인 성공',
           description: '환영합니다!',
@@ -70,7 +64,6 @@ export default function LoginPage() {
         router.push('/');
         router.refresh();
       } else {
-        console.error('Unexpected login result:', result);
         const errorMsg = '로그인 중 오류가 발생했습니다. 다시 시도해주세요.';
         setErrorMessage(errorMsg);
         toast({
@@ -80,7 +73,6 @@ export default function LoginPage() {
         });
       }
     } catch (error) {
-      console.error('Login exception:', error);
       const errorMsg = '로그인 중 오류가 발생했습니다. 다시 시도해주세요.';
       setErrorMessage(errorMsg);
       toast({

@@ -37,9 +37,6 @@ export async function createUser(userData: CreateUserData): Promise<User> {
   try {
     const supabase = await createClient();
     
-    console.log('Supabase client created successfully');
-    console.log('Checking email:', userData.email);
-    
     // 이메일 중복 확인
     const { data: existingEmail, error: emailError } = await supabase
       .from('users')
@@ -47,10 +44,10 @@ export async function createUser(userData: CreateUserData): Promise<User> {
       .eq('email', userData.email)
       .single();
 
-    console.log('Email check result:', { existingEmail, emailError });
-
     if (emailError && emailError.code !== 'PGRST116') {
-      console.error('Email check error:', emailError);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Email check error:', emailError);
+      }
       throw new Error(`이메일 확인 중 오류가 발생했습니다: ${emailError.message}`);
     }
 
@@ -88,13 +85,17 @@ export async function createUser(userData: CreateUserData): Promise<User> {
       .single();
 
     if (createError) {
-      console.error('Create user error:', createError);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Create user error:', createError);
+      }
       throw new Error('사용자 생성 중 오류가 발생했습니다.');
     }
 
     return newUser;
   } catch (error) {
-    console.error('CreateUser function error:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('CreateUser function error:', error);
+    }
     throw error;
   }
 }
@@ -111,7 +112,9 @@ export async function authenticateUser(loginData: LoginData): Promise<User> {
     .single();
 
   if (fetchError) {
-    console.error('Fetch user error:', fetchError);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Fetch user error:', fetchError);
+    }
     
     // PGRST116는 "결과가 없음"을 의미
     if (fetchError.code === 'PGRST116') {

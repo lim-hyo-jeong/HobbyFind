@@ -88,10 +88,7 @@ export default function SignupPage() {
     setIsLoading(true);
     setErrorMessage('');
 
-    console.log('Signup attempt for email:', formData.email);
-
     try {
-      console.log('Sending signup request...');
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
@@ -104,15 +101,10 @@ export default function SignupPage() {
         }),
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-
       const data = await response.json();
-      console.log('Signup response data:', data);
 
       if (!response.ok) {
         const errorMsg = data.message || '회원가입 중 오류가 발생했습니다.';
-        console.error('Signup failed:', { status: response.status, error: errorMsg });
         setErrorMessage(errorMsg);
         
         // 에러 토스트 표시
@@ -121,7 +113,7 @@ export default function SignupPage() {
           description: errorMsg,
           variant: 'destructive',
         });
-        return; // throw 대신 return으로 변경
+        return;
       }
 
       toast({
@@ -130,17 +122,13 @@ export default function SignupPage() {
       });
 
       // 자동 로그인 처리
-      console.log('Attempting auto-login for:', formData.email);
       const signInResult = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
         redirect: false,
       });
 
-      console.log('Auto-login result:', signInResult);
-
       if (signInResult?.error) {
-        console.error('Auto-login error:', signInResult.error);
         toast({
           title: '자동 로그인 실패',
           description: '회원가입은 완료되었지만 자동 로그인에 실패했습니다. 수동으로 로그인해주세요.',
@@ -148,7 +136,6 @@ export default function SignupPage() {
         });
         router.push('/login');
       } else if (signInResult?.ok) {
-        console.log('Auto-login successful');
         toast({
           title: '로그인 성공',
           description: '환영합니다!',
@@ -156,7 +143,6 @@ export default function SignupPage() {
         router.push('/');
         router.refresh();
       } else {
-        console.error('Unexpected auto-login result:', signInResult);
         toast({
           title: '자동 로그인 실패',
           description: '회원가입은 완료되었지만 자동 로그인에 실패했습니다. 수동으로 로그인해주세요.',
@@ -165,7 +151,6 @@ export default function SignupPage() {
         router.push('/login');
       }
     } catch (error) {
-      console.error('Signup error:', error);
       const errorMsg = error instanceof Error ? error.message : '회원가입 중 오류가 발생했습니다.';
       setErrorMessage(errorMsg);
       toast({

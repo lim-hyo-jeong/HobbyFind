@@ -12,8 +12,7 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   const handleBookmarkToggle = (id: string, isBookmarked: boolean) => {
-    // TODO: 북마크 상태를 전역 상태나 API로 관리
-    console.log(`Bookmark ${id}: ${isBookmarked}`);
+    // 북마크 상태는 HobbyCard 컴포넌트에서 관리됨
   };
 
   return (

@@ -27,7 +27,9 @@ export async function getUserBookmarks(userId: string): Promise<Bookmark[]> {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching user bookmarks:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching user bookmarks:', error);
+    }
     throw new Error('북마크 목록을 불러올 수 없습니다.');
   }
 
@@ -48,7 +50,9 @@ export async function addBookmark(userId: string, hobbyId: string): Promise<Book
     .single();
 
   if (error) {
-    console.error('Error adding bookmark:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error adding bookmark:', error);
+    }
     if (error.code === '23505') { // Unique violation
       throw new Error('이미 북마크된 취미입니다.');
     }
@@ -69,7 +73,9 @@ export async function removeBookmark(userId: string, hobbyId: string): Promise<v
     .eq('hobby_id', hobbyId);
 
   if (error) {
-    console.error('Error removing bookmark:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error removing bookmark:', error);
+    }
     throw new Error('북마크를 제거할 수 없습니다.');
   }
 }
@@ -86,7 +92,9 @@ export async function isBookmarked(userId: string, hobbyId: string): Promise<boo
     .single();
 
   if (error && error.code !== 'PGRST116') {
-    console.error('Error checking bookmark status:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error checking bookmark status:', error);
+    }
     throw new Error('북마크 상태를 확인할 수 없습니다.');
   }
 
