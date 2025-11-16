@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Bookmark, Trash2, Calendar } from 'lucide-react';
@@ -74,18 +75,20 @@ export function BookmarkedHobbyGrid({ hobbies, onBookmarkRemove, isLoading }: Bo
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {hobbies.map((hobby) => (
         <Card key={hobby.id} className="group overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-105">
-          <div className="relative">
-            <img
+          <div className="relative h-48 overflow-hidden">
+            <Image
               src={hobby.imageUrl}
               alt={hobby.title}
-              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
-            <div className="absolute top-3 left-3">
+            <div className="absolute top-3 left-3 z-10">
               <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(hobby.category)}`}>
                 {getCategoryName(hobby.category)}
               </span>
             </div>
-            <div className="absolute top-3 right-3 flex space-x-2">
+            <div className="absolute top-3 right-3 flex space-x-2 z-10">
               <Button
                 variant="ghost"
                 size="sm"

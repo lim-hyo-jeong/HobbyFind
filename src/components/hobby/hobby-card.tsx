@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Bookmark } from 'lucide-react';
@@ -122,13 +123,15 @@ export function HobbyCard({
 
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-105">
-      <div className="relative">
-        <img
+      <div className="relative h-48 overflow-hidden">
+        <Image
           src={imageUrl}
           alt={title}
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
-        <div className="absolute top-3 left-3">
+        <div className="absolute top-3 left-3 z-10">
           <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(category)}`}>
             {getCategoryName(category)}
           </span>
@@ -137,7 +140,7 @@ export function HobbyCard({
           <Button
             variant="ghost"
             size="sm"
-            className={`absolute top-3 right-3 w-8 h-8 p-0 rounded-full transition-colors ${
+            className={`absolute top-3 right-3 w-8 h-8 p-0 rounded-full transition-colors z-10 ${
               bookmarked 
                 ? 'bg-brand-gold text-neutral-dark hover:bg-brand-gold/90' 
                 : 'bg-white/80 text-gray-600 hover:bg-white'
